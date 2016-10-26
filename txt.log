@@ -1,0 +1,12 @@
+total 56
+drwxr-xr-x  11 wangbinbin  staff   374B Oct 26 15:10 .
+drwxr-xr-x  12 wangbinbin  staff   408B Oct 26 14:17 ..
+drwxr-xr-x  15 wangbinbin  staff   510B Oct 26 15:10 .git
+-rw-r--r--   1 wangbinbin  staff   266B Oct 26 15:08 .gitignore
+-rw-r--r--   1 wangbinbin  staff   101B Oct 26 14:22 .gitmodules
+-rw-r--r--   1 wangbinbin  staff    18K Oct 26 15:08 LICENSE
+drwxr-xr-x   2 wangbinbin  staff    68B Oct 26 14:35 bin
+drwxr-xr-x   2 wangbinbin  staff    68B Oct 26 14:35 github.com
+drwxr-xr-x   2 wangbinbin  staff    68B Oct 26 14:35 pkg
+drwxr-xr-x   2 wangbinbin  staff    68B Oct 26 14:35 src
+-rw-r--r--   1 wangbinbin  staff     0B Oct 26 15:10 txt.log
