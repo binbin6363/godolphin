@@ -1,6 +1,3 @@
-[submodule "github.com/gotcp"]
-	path = github.com/gotcp
-	url = https://github.com/gansidui/gotcp.git
-[submodule "github.com/gotcp1"]
-	path = github.com/gotcp1
+[submodule "github.com/gansidui/gotcp"]
+	path = github.com/gansidui/gotcp
 	url = https://github.com/gansidui/gotcp.git
