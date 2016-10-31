@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", "127.0.0.1:8989")
+	tcpAddr, err := net.ResolveTCPAddr("tcp4", "139.196.42.222:8989")
 	checkError(err)
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	checkError(err)
