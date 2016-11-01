@@ -13,11 +13,14 @@ func startRoutine(i int) {
 	send <- i
 
 	// send data
-	conn := net.DialTimeout("tcp", "127.0.0.1:9000", 10*time.Second)
+	conn, err := net.DialTimeout("tcp", "127.0.0.1:9000", 10*time.Second)
+	if err != nil {
+	    return
+	}
 	conn.Write(([]byte)("hi, nice to meet you!"))
 	data := make([]byte, 20)
 
-	conn.SetReadDeadline(200*time.Second)
+	conn.SetReadDeadline(time.Now().Add(200*time.Second))
 	conn.Read(data)
 
 	conn.Close()
