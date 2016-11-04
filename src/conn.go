@@ -2,10 +2,12 @@ package gotcp
 
 import (
 	"errors"
+	"log"
 	"net"
 	"sync"
 	"sync/atomic"
 	"time"
+	"github.com/astaxie/beego/logs"
 )
 
 // Error type
@@ -71,7 +73,7 @@ func (c *Conn) GetRawConn() *net.TCPConn {
 func (c *Conn) Close() {
 	c.closeOnce.Do(func() {
 		atomic.StoreInt32(&c.closeFlag, 1)
-		close(c.closeChan)
+		close(c.closeChan) // 关闭连接
 		close(c.packetSendChan)
 		close(c.packetReceiveChan)
 		c.conn.Close()
@@ -111,7 +113,7 @@ func (c *Conn) AsyncWritePacket(p Packet, timeout time.Duration) (err error) {
 		case c.packetSendChan <- p:
 			return nil
 
-		// 连接已关闭
+		// 收到连接关闭的信号
 		case <-c.closeChan:
 			return ErrConnClosing
 
@@ -122,8 +124,8 @@ func (c *Conn) AsyncWritePacket(p Packet, timeout time.Duration) (err error) {
 	}
 }
 
-// Do it
-func (c *Conn) Do() {
+// Do it, 链式调用
+func (c *Conn) Do() *Conn {
 	if !c.srv.callback.OnConnect(c) {
 		return
 	}
@@ -131,6 +133,7 @@ func (c *Conn) Do() {
 	asyncDo(c.handleLoop, c.srv.waitGroup)
 	asyncDo(c.readLoop, c.srv.waitGroup)
 	asyncDo(c.writeLoop, c.srv.waitGroup)
+	return c
 }
 
 // 从网络读取数据并分包传到接收队列
@@ -145,14 +148,21 @@ func (c *Conn) readLoop() {
 		case <-c.srv.exitChan:
 			return
 
+		// 收到连接关闭的信号
 		case <-c.closeChan:
 			return
 
 		default:
 		}
 
-		p, err := c.srv.protocol.ReadPacket(c.conn)
+		p, err := c.srv.protocol.SplitPacket(c.conn)
 		if err != nil {
+			// TODO: 包错误，考虑到安全因素，需要断开连接，断开之前是否要等待写数据包完成呢？
+			select{
+				case <- time.After(1*time.Second)
+				Close()
+				break
+			}
 			return
 		}
 
@@ -172,6 +182,7 @@ func (c *Conn) writeLoop() {
 		case <-c.srv.exitChan:
 			return
 
+		// 收到连接关闭的信号
 		case <-c.closeChan:
 			return
 
@@ -179,8 +190,15 @@ func (c *Conn) writeLoop() {
 			if c.IsClosed() {
 				return
 			}
-			if _, err := c.conn.Write(p.Serialize()); err != nil {
-				return
+			if data, err := p.Encode(); err != nil {
+				if _, err = c.conn.Write(data); err != nil {
+					log.Warn("write data failed, disconnect net connection.")
+					Close()
+					// 写出错就不用等待读取完成
+					return
+				}
+			} else {
+				log.Warn("encode data failed.")
 			}
 		}
 	}
@@ -198,6 +216,7 @@ func (c *Conn) handleLoop() {
 		case <-c.srv.exitChan:
 			return
 
+		// 收到连接关闭的信号
 		case <-c.closeChan:
 			return
 

@@ -47,6 +47,7 @@ func main() {
 	config := &gotcp.Config{
 		PacketSendChanLimit:    20,
 		PacketReceiveChanLimit: 20,
+		ConnectionChanLimit:    200000,
 	}
 	srv := gotcp.NewServer(config, &Callback{}, &echo.EchoProtocol{})
 

@@ -13,8 +13,12 @@ type EchoPacket struct {
 	buff []byte
 }
 
-func (this *EchoPacket) Serialize() []byte {
-	return this.buff
+func (this *EchoPacket) Encode() []byte, error {
+	return this.buff, nil
+}
+
+func (this *EchoPacket) Decode([]byte) error {
+	return this.buff, nil
 }
 
 func (this *EchoPacket) GetLength() uint32 {
@@ -25,8 +29,13 @@ func (this *EchoPacket) GetBody() []byte {
 	return this.buff[4:]
 }
 
-func NewEchoPacket(buff []byte, hasLengthField bool) *EchoPacket {
+func NewEchoPacket(buff []byte, hasLengthField bool) (*EchoPacket, error) {
 	p := &EchoPacket{}
+
+	// 只要这个decode就行，后面的代码可以省略
+	if err := p.Decode(buff); nil != err {
+		return nil, err
+	}
 
 	if hasLengthField {
 		p.buff = buff
@@ -37,7 +46,7 @@ func NewEchoPacket(buff []byte, hasLengthField bool) *EchoPacket {
 		copy(p.buff[4:], buff)
 	}
 
-	return p
+	return p, nil
 }
 
 type EchoProtocol struct {
@@ -65,5 +74,5 @@ func (this *EchoProtocol) ReadPacket(conn *net.TCPConn) (gotcp.Packet, error) {
 		return nil, err
 	}
 
-	return NewEchoPacket(buff, true), nil
+	return NewEchoPacket(buff, true)
 }
