@@ -44,7 +44,7 @@ func makeList() chan int {
 func main() {
 
 	runtime.GOMAXPROCS(2)
-	log := logs.NewLogger(1000)
+	log := logs.NewLogger(100)
 
 	log.SetLogger("file", `{"filename":"test.log"}`)
 	log.Info("start demo pipe test, this is a log file.")

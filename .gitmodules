@@ -1,3 +1,6 @@
 [submodule "github.com/gansidui/gotcp"]
 	path = github.com/gansidui/gotcp
 	url = https://github.com/gansidui/gotcp.git
+[submodule "github.com/astaxie/beego"]
+	path = github.com/astaxie/beego
+	url = https://github.com/astaxie/beego.git
