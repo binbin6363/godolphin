@@ -125,7 +125,7 @@ func (c *Conn) AsyncWritePacket(p Packet, timeout time.Duration) (err error) {
 // Do it, 链式调用
 func (c *Conn) Do() *Conn {
 	if !c.srv.callback.OnConnect(c) {
-		return
+		return c
 	}
 
 	asyncDo(c.handleLoop, c.srv.waitGroup)
